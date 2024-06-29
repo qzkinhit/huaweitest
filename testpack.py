@@ -2,23 +2,31 @@
 import sys
 from pyspark import SparkConf, SparkContext
 import importlib
-import pkg_resources
+import importlib.metadata
+
 
 def check_package_version(package_name, expected_version):
     try:
         package = importlib.import_module(package_name)
-        installed_version = pkg_resources.get_distribution(package_name).version
+        installed_version = importlib.metadata.version(package_name)
         if installed_version == expected_version:
             result = f"{package_name} version {installed_version} is correctly installed."
         else:
             result = f"{package_name} version {installed_version} is installed, but {expected_version} is expected."
     except ImportError:
         result = f"{package_name} is not installed."
-    except pkg_resources.DistributionNotFound:
+    except importlib.metadata.PackageNotFoundError:
         result = f"{package_name} is not installed."
     return result
 
+
 if __name__ == "__main__":
+    if len(sys.argv) < 2:
+        print("Usage: check_versions_spark <outputPath>")
+        exit(-1)
+
+    outputPath = sys.argv[1]
+
     # 创建SparkConf
     conf = SparkConf().setAppName("PackageVersionCheck")
     # 创建SparkContext
@@ -47,9 +55,10 @@ if __name__ == "__main__":
     rdd = sc.parallelize(packages.items())
     results = rdd.map(lambda package: check_package_version(package[0], package[1])).collect()
 
-    # 打印结果
-    for result in results:
-        print(result)
+    # 将结果写入文件
+    with open(outputPath, 'w') as f:
+        for result in results:
+            f.write(result + '\n')
 
     # 停止SparkContext
     sc.stop()
