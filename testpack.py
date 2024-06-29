@@ -9,13 +9,14 @@ def check_package_version(package_name, expected_version):
         package = importlib.import_module(package_name)
         installed_version = pkg_resources.get_distribution(package_name).version
         if installed_version == expected_version:
-            print(f"{package_name} version {installed_version} is correctly installed.")
+            result = f"{package_name} version {installed_version} is correctly installed."
         else:
-            print(f"{package_name} version {installed_version} is installed, but {expected_version} is expected.")
+            result = f"{package_name} version {installed_version} is installed, but {expected_version} is expected."
     except ImportError:
-        print(f"{package_name} is not installed.")
+        result = f"{package_name} is not installed."
     except pkg_resources.DistributionNotFound:
-        print(f"{package_name} is not installed.")
+        result = f"{package_name} is not installed."
+    return result
 
 if __name__ == "__main__":
     # 创建SparkConf
@@ -44,7 +45,11 @@ if __name__ == "__main__":
 
     # 在 Spark 环境中并行检查包的版本
     rdd = sc.parallelize(packages.items())
-    rdd.foreach(lambda package: check_package_version(package[0], package[1]))
+    results = rdd.map(lambda package: check_package_version(package[0], package[1])).collect()
+
+    # 打印结果
+    for result in results:
+        print(result)
 
     # 停止SparkContext
     sc.stop()
