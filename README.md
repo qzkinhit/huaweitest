@@ -1,27 +1,9 @@
-# -*- coding: utf-8 -*-
-from pyspark.sql import SparkSession
-
-def main():
-    # 创建SparkSession并配置以访问Spark元数据
-    spark = SparkSession.builder \
-        .appName("DataCleaning") \
-        .enableHiveSupport() \
-        .config("spark.sql.session.state.builder", "org.apache.spark.sql.hive.UQueryHiveACLSessionStateBuilder") \
-        .config("spark.sql.catalog.class", "org.apache.spark.sql.hive.UQueryHiveACLExternalCatalog") \
-        .config("hive.exec.dynamic.partition.mode", "nonstrict") \
-        .config("spark.dli.metaAccess.enable", "true") \
-        .getOrCreate()
-
-    # 读取数据湖中的表格信息
-    query = "SELECT * FROM tid_sdi_ai4data.ai4data_enterprise_bak LIMIT 100"  # 仅读取前100行进行示例
-    df = spark.sql(query)
-
-    # 显示原始数据
-    print("Original Data:")
-    df.show()
-
-    # 停止SparkSession
-    spark.stop()
-
-if __name__ == "__main__":
+Traceback (most recent call last):
+  File "/tmp/spark-6a499f31-1a85-436e-818f-a83d8a7aadec/test.py", line 27, in <module>
     main()
+  File "/tmp/spark-6a499f31-1a85-436e-818f-a83d8a7aadec/test.py", line 17, in main
+    df = spark.sql(query)
+  File "/opt/spark/python/lib/pyspark.zip/pyspark/sql/session.py", line 723, in sql
+  File "/opt/spark/python/lib/py4j-0.10.9-src.zip/py4j/java_gateway.py", line 1305, in __call__
+  File "/opt/spark/python/lib/pyspark.zip/pyspark/sql/utils.py", line 117, in deco
+pyspark.sql.utils.AnalysisException: java.lang.RuntimeException: org.apache.hadoop.hive.ql.metadata.HiveException: DLCatalog session metastore client class is not been config, hive-ext.dlcatalog.metastore.session.client.class
