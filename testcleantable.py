@@ -5,10 +5,13 @@ def main():
     # 创建SparkSession并配置以访问Spark元数据
     spark = SparkSession.builder \
         .appName("DataCleaning") \
+        .enableHiveSupport() \
         .config("spark.sql.session.state.builder", "org.apache.spark.sql.hive.UQueryHiveACLSessionStateBuilder") \
         .config("spark.sql.catalog.class", "org.apache.spark.sql.hive.UQueryHiveACLExternalCatalog") \
-        .config("spark.sql.extensions", "org.apache.spark.sql.DliSparkExtension") \
-        .enableHiveSupport() \
+        .config("spark.sql.extensions",','.join(["org.apache.spark.sql.CarbonInternalExtensions","org.apache.spark"
+                                                                                                 ".sql.DliSparkExtension"])) \
+        .config("hive.exec.dynamic.partition.mode", "nonstrict") \
+        .config("spark.dli.metaAccess.enable", "true") \
         .getOrCreate()
 
     # 读取数据湖中的表格信息
