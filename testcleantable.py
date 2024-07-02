@@ -15,24 +15,9 @@ def main(output_table):
     print("Original Data:")
     df.show()
 
-    # 数据清洗操作示例：删除包含缺失值的行
-    cleaned_df = df.na.drop()
-
-    # 显示清洗后的数据
-    print("Cleaned Data:")
-    cleaned_df.show()
-
-    # 将清洗后的数据写入另一个表
-    cleaned_df.write.mode("overwrite").saveAsTable(output_table)
-
     # 停止SparkSession
     spark.stop()
 
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print("Usage: dliquery <outputTable>")
-        exit(-1)
-
-    output_table = sys.argv[1]
-    main(output_table)
+    main()
