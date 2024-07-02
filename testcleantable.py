@@ -8,8 +8,7 @@ def main():
         .enableHiveSupport() \
         .config("spark.sql.session.state.builder", "org.apache.spark.sql.hive.UQueryHiveACLSessionStateBuilder") \
         .config("spark.sql.catalog.class", "org.apache.spark.sql.hive.UQueryHiveACLExternalCatalog") \
-        .config("spark.sql.extensions",','.join(["org.apache.spark.sql.CarbonInternalExtensions","org.apache.spark"
-                                                                                                 ".sql.DliSparkExtension"])) \
+        .config("spark.sql.extensions", ','.join(["org.apache.spark.sql.CarbonInternalExtensions", "org.apache.spark.sql.DliSparkExtension"])) \
         .config("hive.exec.dynamic.partition.mode", "nonstrict") \
         .config("spark.dli.metaAccess.enable", "true") \
         .getOrCreate()
@@ -21,6 +20,9 @@ def main():
     # 显示原始数据
     print("Original Data:")
     df.show()
+
+    # 将查询结果写入一个新表 find100
+    df.write.mode("overwrite").saveAsTable("tid_sdi_ai4data.find100")
 
     # 停止SparkSession
     spark.stop()
