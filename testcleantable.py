@@ -5,18 +5,17 @@ def main():
     # 创建SparkSession并配置以访问Spark元数据
     spark = SparkSession.builder \
         .appName("DataCleaning") \
-        .enableHiveSupport() \
-        .config("spark.sql.session.state.builder", "org.apache.spark.sql.hive.UQueryHiveACLSessionStateBuilder") \
-        .config("spark.sql.catalog.class", "org.apache.spark.sql.hive.UQueryHiveACLExternalCatalog") \
-        .config("spark.sql.extensions", ','.join(["org.apache.spark.sql.CarbonInternalExtensions", "org.apache.spark.sql.DliSparkExtension"])) \
-        .config("hive.exec.dynamic.partition.mode", "nonstrict") \
-        .config("spark.dli.metaAccess.enable", "true") \
+        .config("spark.sql.session.state.builder", "org.apache.spark.sql.hive.UQueryHiveACLSessionStateBuilder")\
+        .config("spark.sql.catalog.class", "org.apache.spark.sql.hive.UQueryHiveACLExternalCatalog")\
+        .config("spark.sql.extensions", "org.apache.spark.sql.DliSparkExtension")\
+        .config("spark.sql.hive.implementation", "org.apache.spark.sql.hive.client.DliHiveClientImpl")\
+        .appName("java_spark_demo")\
         .getOrCreate()
 
     # 读取数据湖中的表格信息
     query = "SELECT * FROM tid_sdi_ai4data.ai4data_enterprise_bak LIMIT 100"  # 仅读取前100行进行示例
     df = spark.sql(query)
-
+    print(df.count())
     # 显示原始数据
     print("Original Data:")
     df.show()
