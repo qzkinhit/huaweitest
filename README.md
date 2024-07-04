@@ -15,3 +15,10 @@ print(sys.version)
 print("Version info.")
 print(sys.version_info)
 
+
+import platform
+import sys
+
+cpu_arch = platform.machine()
+print(f"CPU Architecture: {cpu_arch}")
+
