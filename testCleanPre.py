@@ -120,7 +120,8 @@ for level_index, level in enumerate(nodes):
             # editRuleList = []
             print(f"  在 spark 的分块数: {len(sample_Block_df)}")
             for blockData in sample_Block_df:
-                blockData.show()
+                print(f"  当前块内的样本大小")
+                print(blockData.count())
                 # sample_df = blockData.toPandas()
                 # print(f"数据块大小: {sample_df.shape[0]}")
 
