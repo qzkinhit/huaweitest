@@ -1,7 +1,7 @@
 from collections import defaultdict, deque
 from typing import List, Tuple, Dict, Set
 # import matplotlib.pyplot as plt
-import networkx as nx
+# import networkx as nx
 
 
 def PreParamClassier(cleanners):
@@ -26,129 +26,129 @@ def PreParamClassier(cleanners):
 
 
 # 1. 构建依赖关系图
-def build_dependency_graph(edges: List[Tuple[List[str], List[str]]]) -> nx.DiGraph:
-    """从元组对构建依赖关系图"""
-    graph = nx.DiGraph()
-    for source, target in edges:
-        for s in source:
-            for t in target:
-                graph.add_edge(s, t)
-    return graph
+# def build_dependency_graph(edges: List[Tuple[List[str], List[str]]]) -> nx.DiGraph:
+#     """从元组对构建依赖关系图"""
+#     graph = nx.DiGraph()
+#     for source, target in edges:
+#         for s in source:
+#             for t in target:
+#                 graph.add_edge(s, t)
+#     return graph
 
 # 2. 识别关键点
-def identify_key_points(graph: nx.DiGraph) -> List[str]:
-    """识别入度为0的关键点"""
-    return [node for node in graph if graph.in_degree(node) == 0]
+# def identify_key_points(graph: nx.DiGraph) -> List[str]:
+#     """识别入度为0的关键点"""
+#     return [node for node in graph if graph.in_degree(node) == 0]
 
 # 3. 合并环上的节点
-def merge_cycles(graph: nx.DiGraph) -> nx.DiGraph:
-    """合并图中的环节点"""
-    node_mapping = {node: {node} for node in graph.nodes}
-    while True:
-        try:
-            cycles = list(nx.simple_cycles(graph))
-        except nx.NetworkXNoCycle:
-            break
-        if not cycles:
-            break
-        for cycle in cycles:
-            cycle_nodes = set(cycle)
-            merged_node = ','.join(sorted(cycle_nodes))
-            node_mapping[merged_node] = set()
-            for node in cycle_nodes:
-                node_mapping[merged_node].update(node_mapping.pop(node))
-            # Create a new graph with the merged node
-            new_graph = nx.DiGraph()
-            for node in graph.nodes:
-                if node not in cycle_nodes:
-                    new_graph.add_node(node)
-            new_graph.add_node(merged_node)
-            for u, v in graph.edges:
-                if u in cycle_nodes and v in cycle_nodes:
-                    continue
-                if u in cycle_nodes:
-                    new_graph.add_edge(merged_node, v)
-                elif v in cycle_nodes:
-                    new_graph.add_edge(u, merged_node)
-                else:
-                    new_graph.add_edge(u, v)
-            graph = new_graph
-            break
-    return graph, node_mapping
+# def merge_cycles(graph: nx.DiGraph) -> nx.DiGraph:
+#     """合并图中的环节点"""
+#     node_mapping = {node: {node} for node in graph.nodes}
+#     while True:
+#         try:
+#             cycles = list(nx.simple_cycles(graph))
+#         except nx.NetworkXNoCycle:
+#             break
+#         if not cycles:
+#             break
+#         for cycle in cycles:
+#             cycle_nodes = set(cycle)
+#             merged_node = ','.join(sorted(cycle_nodes))
+#             node_mapping[merged_node] = set()
+#             for node in cycle_nodes:
+#                 node_mapping[merged_node].update(node_mapping.pop(node))
+#             # Create a new graph with the merged node
+#             new_graph = nx.DiGraph()
+#             for node in graph.nodes:
+#                 if node not in cycle_nodes:
+#                     new_graph.add_node(node)
+#             new_graph.add_node(merged_node)
+#             for u, v in graph.edges:
+#                 if u in cycle_nodes and v in cycle_nodes:
+#                     continue
+#                 if u in cycle_nodes:
+#                     new_graph.add_edge(merged_node, v)
+#                 elif v in cycle_nodes:
+#                     new_graph.add_edge(u, merged_node)
+#                 else:
+#                     new_graph.add_edge(u, v)
+#             graph = new_graph
+#             break
+#     return graph, node_mapping
 
 # 4. 基于关键点划分图
-def partition_graph(graph: nx.DiGraph, key_points: List[str]) -> List[Tuple[List[str], str]]:
-    """基于关键点划分图"""
-    partitions = []
-    for key in key_points:
-        dependent_nodes = nx.descendants(graph, key) | {key}
-        for node in dependent_nodes:
-            if graph.out_degree(node) > 0:
-                targets = list(graph.successors(node))
-                partitions.append((targets, node))
-    return partitions
-
-# 5. 确定处理顺序
-def determine_processing_order(partitions: List[Tuple[List[str], str]]) -> List[Tuple[List[str], str]]:
-    """确定处理顺序"""
-    return sorted(partitions, key=lambda x: x[1])
-
-# 6. 计算节点层级
-def compute_node_levels(graph: nx.DiGraph) -> Dict[str, int]:
-    """计算图中每个节点的层级（最大深度）"""
-    levels = {node: 0 for node in graph}
-    for node in nx.topological_sort(graph):
-        levels[node] = max([levels[pred] + 1 for pred in graph.predecessors(node)], default=0)
-    return levels
+# def partition_graph(graph: nx.DiGraph, key_points: List[str]) -> List[Tuple[List[str], str]]:
+#     """基于关键点划分图"""
+#     partitions = []
+#     for key in key_points:
+#         dependent_nodes = nx.descendants(graph, key) | {key}
+#         for node in dependent_nodes:
+#             if graph.out_degree(node) > 0:
+#                 targets = list(graph.successors(node))
+#                 partitions.append((targets, node))
+#     return partitions
+#
+# # 5. 确定处理顺序
+# def determine_processing_order(partitions: List[Tuple[List[str], str]]) -> List[Tuple[List[str], str]]:
+#     """确定处理顺序"""
+#     return sorted(partitions, key=lambda x: x[1])
+#
+# # 6. 计算节点层级
+# def compute_node_levels(graph: nx.DiGraph) -> Dict[str, int]:
+#     """计算图中每个节点的层级（最大深度）"""
+#     levels = {node: 0 for node in graph}
+#     for node in nx.topological_sort(graph):
+#         levels[node] = max([levels[pred] + 1 for pred in graph.predecessors(node)], default=0)
+#     return levels
 
 # 7. 层次布局
-def hierarchical_layout(graph: nx.DiGraph, vertical_gap: float = 1.0, horizontal_gap: float = 2.0) -> Dict[str, Tuple[float, float]]:
-    """为图生成层次布局"""
-    levels = compute_node_levels(graph)
-    level_groups = {}
-    for node, level in levels.items():
-        level_groups.setdefault(level, []).append(node)
-    pos = {}
-    for level, nodes in level_groups.items():
-        for i, node in enumerate(sorted(nodes)):
-            pos[node] = (i * horizontal_gap, -level * vertical_gap)
-    return pos
+# def hierarchical_layout(graph: nx.DiGraph, vertical_gap: float = 1.0, horizontal_gap: float = 2.0) -> Dict[str, Tuple[float, float]]:
+#     """为图生成层次布局"""
+#     levels = compute_node_levels(graph)
+#     level_groups = {}
+#     for node, level in levels.items():
+#         level_groups.setdefault(level, []).append(node)
+#     pos = {}
+#     for level, nodes in level_groups.items():
+#         for i, node in enumerate(sorted(nodes)):
+#             pos[node] = (i * horizontal_gap, -level * vertical_gap)
+#     return pos
 
 # 8. 识别并分割出连通图
-def find_connected_components(graph: nx.DiGraph) -> List[nx.DiGraph]:
-    """识别并分割出连通图"""
-    return [graph.subgraph(c).copy() for c in nx.weakly_connected_components(graph)]
+# def find_connected_components(graph: nx.DiGraph) -> List[nx.DiGraph]:
+#     """识别并分割出连通图"""
+#     return [graph.subgraph(c).copy() for c in nx.weakly_connected_components(graph)]
 
 # 9. 对连通图进行拓扑排序，检测循环依赖
-def topological_sort_with_cycles(graph: nx.DiGraph) -> Tuple[List[str], bool]:
-    """对连通图进行拓扑排序，检测循环依赖"""
-    try:
-        return list(nx.topological_sort(graph)), False  # No cycle
-    except nx.NetworkXUnfeasible:
-        return [], True  # Cycle detected
+# def topological_sort_with_cycles(graph: nx.DiGraph) -> Tuple[List[str], bool]:
+#     """对连通图进行拓扑排序，检测循环依赖"""
+#     try:
+#         return list(nx.topological_sort(graph)), False  # No cycle
+#     except nx.NetworkXUnfeasible:
+#         return [], True  # Cycle detected
 
 # 10. 找到每个连通图的起始节点
-def find_starting_nodes(graph: nx.DiGraph, sorted_nodes: List[str]) -> List[str]:
-    """找到每个连通图的起始节点"""
-    in_degree = graph.in_degree()
-    return [node for node in sorted_nodes if in_degree[node] == 0]
+# def find_starting_nodes(graph: nx.DiGraph, sorted_nodes: List[str]) -> List[str]:
+#     """找到每个连通图的起始节点"""
+#     in_degree = graph.in_degree()
+#     return [node for node in sorted_nodes if in_degree[node] == 0]
 
 # 11. 分析依赖关系，返回连通图的信息
-def analyze_dependencies(edges: List[Tuple[List[str], List[str]]]) -> Dict[str, Dict]:
-    """分析依赖关系，返回连通图的信息"""
-    dependency_graph = build_dependency_graph(edges)
-    dependency_graph, node_mapping = merge_cycles(dependency_graph)
-    connected_components = find_connected_components(dependency_graph)
-    analysis = {}
-    for i, component in enumerate(connected_components):
-        order, has_cycle = topological_sort_with_cycles(component)
-        start_nodes = find_starting_nodes(component, order) if not has_cycle else []
-        analysis[f"Component_{i + 1}"] = {
-            "Topological_Order": order,
-            "Has_Cycle": has_cycle,
-            "Starting_Nodes": start_nodes
-        }
-    return analysis, node_mapping
+# def analyze_dependencies(edges: List[Tuple[List[str], List[str]]]) -> Dict[str, Dict]:
+#     """分析依赖关系，返回连通图的信息"""
+#     dependency_graph = build_dependency_graph(edges)
+#     dependency_graph, node_mapping = merge_cycles(dependency_graph)
+#     connected_components = find_connected_components(dependency_graph)
+#     analysis = {}
+#     for i, component in enumerate(connected_components):
+#         order, has_cycle = topological_sort_with_cycles(component)
+#         start_nodes = find_starting_nodes(component, order) if not has_cycle else []
+#         analysis[f"Component_{i + 1}"] = {
+#             "Topological_Order": order,
+#             "Has_Cycle": has_cycle,
+#             "Starting_Nodes": start_nodes
+#         }
+#     return analysis, node_mapping
 
 # 12. 将处理顺序转换为指定的格式
 def format_combined_processing_order(processing_order: List[Tuple[List[str], str]], node_mapping: Dict[str, Set[str]]) -> List[Tuple[List[Set[str]], List[Set[str]]]]:
@@ -163,32 +163,32 @@ def format_combined_processing_order(processing_order: List[Tuple[List[str], str
     return sorted(formatted_order, key=lambda x: len(x[0]))
 
 # 13. 分析和可视化依赖关系
-def analyze_and_visualize_dependencies(edges: List[Tuple[List[str], List[str]]]):
-    """分析和可视化依赖关系"""
-    analysis, node_mapping = analyze_dependencies(edges)
-    dependency_graph = build_dependency_graph(edges)
-    dependency_graph, node_mapping = merge_cycles(dependency_graph)
-    key_points = identify_key_points(dependency_graph)
-    partitions = partition_graph(dependency_graph, key_points)
-    processing_order = determine_processing_order(partitions)
-    format_processing_order = format_combined_processing_order(processing_order, node_mapping)
-    # # 画图
-    # plt.figure(figsize=(15, 11))
-    # pos = hierarchical_layout(dependency_graph, vertical_gap=2, horizontal_gap=2)  # 调整布局参数
-    # # 绘制节点
-    # start_nodes = [node for comp in analysis.values() for node in comp["Starting_Nodes"]]
-    # end_nodes = [node for node in dependency_graph.nodes() if node not in start_nodes]
-    # nx.draw_networkx_nodes(dependency_graph, pos, nodelist=end_nodes, node_color='skyblue', node_size=4000)
-    # # 标签字体
-    # nx.draw_networkx_labels(dependency_graph, pos, font_size=32)
-    # # 高亮起始节点
-    # nx.draw_networkx_nodes(dependency_graph, pos, nodelist=start_nodes, node_color='lightgreen', node_size=3000)
-    # # 绘制边线条
-    # nx.draw_networkx_edges(dependency_graph, pos, arrowstyle='->', arrowsize=60, edge_color='gray', width=5)
-    # plt.title('Hierarchical Dependency Graph', fontsize=20)
-    # plt.axis('off')
-    # return analysis, format_processing_order, plt
-    return analysis, format_processing_order
+# def analyze_and_visualize_dependencies(edges: List[Tuple[List[str], List[str]]]):
+#     """分析和可视化依赖关系"""
+#     analysis, node_mapping = analyze_dependencies(edges)
+#     dependency_graph = build_dependency_graph(edges)
+#     dependency_graph, node_mapping = merge_cycles(dependency_graph)
+#     key_points = identify_key_points(dependency_graph)
+#     partitions = partition_graph(dependency_graph, key_points)
+#     processing_order = determine_processing_order(partitions)
+#     format_processing_order = format_combined_processing_order(processing_order, node_mapping)
+#     # # 画图
+#     # plt.figure(figsize=(15, 11))
+#     # pos = hierarchical_layout(dependency_graph, vertical_gap=2, horizontal_gap=2)  # 调整布局参数
+#     # # 绘制节点
+#     # start_nodes = [node for comp in analysis.values() for node in comp["Starting_Nodes"]]
+#     # end_nodes = [node for node in dependency_graph.nodes() if node not in start_nodes]
+#     # nx.draw_networkx_nodes(dependency_graph, pos, nodelist=end_nodes, node_color='skyblue', node_size=4000)
+#     # # 标签字体
+#     # nx.draw_networkx_labels(dependency_graph, pos, font_size=32)
+#     # # 高亮起始节点
+#     # nx.draw_networkx_nodes(dependency_graph, pos, nodelist=start_nodes, node_color='lightgreen', node_size=3000)
+#     # # 绘制边线条
+#     # nx.draw_networkx_edges(dependency_graph, pos, arrowstyle='->', arrowsize=60, edge_color='gray', width=5)
+#     # plt.title('Hierarchical Dependency Graph', fontsize=20)
+#     # plt.axis('off')
+#     # return analysis, format_processing_order, plt
+#     return analysis, format_processing_order
 # 生成用户友好的分析结果描述文本
 def explain_analysis_results(analysis: Dict[str, Dict], processing_order: List[Tuple[List[Set[str]], List[Set[str]]]]) -> str:
     """生成用户友好的解释文本以描述分析结果和处理顺序"""
@@ -235,14 +235,26 @@ def explain_analysis_results_zh(analyze: Dict[str, Dict],
 def discover_cleaner_associations(AttrDependencies):
     """分析和可视化属性依赖关系"""
     # 分析和可视化属性依赖
-    analyze, processing_order, pic = analyze_and_visualize_dependencies(AttrDependencies)
+    # analyze, processing_order = analyze_and_visualize_dependencies(AttrDependencies)
+    analyze={'Component_1': {'Topological_Order': ['establishment_date', 'establishment_time'], 'Has_Cycle': False,
+                     'Starting_Nodes': ['establishment_date']},
+     'Component_2': {'Topological_Order': ['registered_capital', 'registered_capital_scale'], 'Has_Cycle': False,
+                     'Starting_Nodes': ['registered_capital']}, 'Component_3': {
+        'Topological_Order': ['enterprise_id', 'social_credit_code', 'enterprise_name', 'industry_first',
+                              'enterprise_type', 'industry_second', 'industry_third'], 'Has_Cycle': False,
+        'Starting_Nodes': ['enterprise_id', 'social_credit_code']},
+     'Component_4': {'Topological_Order': ['annual_turnover', 'annual_turnover_interval'], 'Has_Cycle': False,
+                     'Starting_Nodes': ['annual_turnover']}, 'Component_5': {
+        'Topological_Order': ['enterprise_address', 'latitude', 'longitude', 'province', 'city', 'district'],
+        'Has_Cycle': False, 'Starting_Nodes': ['enterprise_address']}}
+    processing_order=[([{'annual_turnover'}], [{'annual_turnover_interval'}]), ([{'enterprise_address'}], [{'latitude'}]), ([{'enterprise_address'}], [{'longitude'}]), ([{'enterprise_name'}], [{'industry_first'}]), ([{'enterprise_name'}], [{'enterprise_type'}]), ([{'establishment_date'}], [{'establishment_time'}]), ([{'registered_capital'}], [{'registered_capital_scale'}]), ([{'enterprise_id'}, {'social_credit_code'}], [{'enterprise_name'}]), ([{'industry_second'}, {'enterprise_name'}], [{'industry_third'}]), ([{'industry_first'}, {'enterprise_name'}], [{'industry_second'}]), ([{'latitude'}, {'longitude'}, {'enterprise_address'}], [{'province'}]), ([{'latitude'}, {'city'}, {'longitude'}, {'enterprise_address'}], [{'district'}]), ([{'latitude'}, {'province'}, {'longitude'}, {'enterprise_address'}], [{'city'}])]
     # 提取源和目标集
     source_sets, target_sets = extract_source_target_sets(processing_order)
     # 解释结果
     explain = explain_analysis_results_zh(analyze, processing_order)
-    # 可视化结果展示
-    pic.show()
-    return source_sets, target_sets, explain, pic, processing_order
+    # # 可视化结果展示
+    # pic.show()
+    return source_sets, target_sets, explain, processing_order
 
 def associations_classier(multi, source_sets: List[List[Set[str]]], target_sets: List[List[Set[str]]]):
     """对多域清洗器进行分类"""

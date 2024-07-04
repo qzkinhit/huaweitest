@@ -2,6 +2,8 @@ from pyspark.sql.functions import monotonically_increasing_id
 
 from AnalyticsCache.cleaner_associations_cycle import PreParamClassier, discover_cleaner_associations, \
     associations_classier
+# from AnalyticsCache.cleaner_associations_cycle import PreParamClassier, discover_cleaner_associations, \
+#     associations_classier
 from CoreSetSample.mapping_samplify import Generate_Sample
 # from SampleScrubber.cleaner.multiple import AttrRelation
 from functools import reduce
@@ -85,7 +87,7 @@ data.show()
 # 初始化和分析清洗器
 print("初始化清洗器和分析依赖关系...")
 Edges, singles, multis = PreParamClassier(cleaners)
-source_sets, target_sets, explain, pic, processing_order = discover_cleaner_associations(Edges)
+source_sets, target_sets, explain, processing_order = discover_cleaner_associations(Edges)
 
 print("执行层级和目标模型分类...")
 levels, models, nodes = associations_classier(multis, source_sets, target_sets)
