@@ -1,9 +1,6 @@
-Traceback (most recent call last):
-  File "/tmp/spark-6a499f31-1a85-436e-818f-a83d8a7aadec/test.py", line 27, in <module>
-    main()
-  File "/tmp/spark-6a499f31-1a85-436e-818f-a83d8a7aadec/test.py", line 17, in main
-    df = spark.sql(query)
-  File "/opt/spark/python/lib/pyspark.zip/pyspark/sql/session.py", line 723, in sql
-  File "/opt/spark/python/lib/py4j-0.10.9-src.zip/py4j/java_gateway.py", line 1305, in __call__
-  File "/opt/spark/python/lib/pyspark.zip/pyspark/sql/utils.py", line 117, in deco
-pyspark.sql.utils.AnalysisException: java.lang.RuntimeException: org.apache.hadoop.hive.ql.metadata.HiveException: DLCatalog session metastore client class is not been config, hive-ext.dlcatalog.metastore.session.client.class
+conda create -n pyenv --copy -y python=3.7 numpy pandas xgboost  # 创建虚拟环境pyenv,并安装需要的第三方依赖包，以numpy pandas xgboost为例（当前python版本为3.7）
+conda install -c johnsnowlabs spark-nlp==4.2.8  # 安装spark-nlp依赖包
+cd /home/gecongcong/anaconda3/envs/  # 进入该虚拟环境所在目录
+chmod -R 777 pyenv  # 增加权限，避免打包上传MRS后，服务器端解压失败（重要！）
+zip -r pyenv_x86.zip pyenv/  # 打包该虚拟环境pyenv
+explorer.exe .  # 若通过windows内置wsl的linux系统操作上述步骤，则打包后的文件存储位置可通过该命令访问
