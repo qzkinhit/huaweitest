@@ -120,8 +120,9 @@ for level_index, level in enumerate(nodes):
             # editRuleList = []
             print(f"  在 spark 的分块数: {len(sample_Block_df)}")
             for blockData in sample_Block_df:
-                sample_df = blockData.toPandas()
-                print(f"数据块大小: {sample_df.shape[0]}")
+                blockData.show()
+                # sample_df = blockData.toPandas()
+                # print(f"数据块大小: {sample_df.shape[0]}")
 
             #     preCleaners = [single for single in singles if
             #                    any(attr_set in sset + [node] for attr_set in single.domain)]
