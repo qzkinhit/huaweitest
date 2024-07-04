@@ -1,11 +1,17 @@
 # -*- coding: utf-8 -*-
-import sys
 from pyspark.sql import SparkSession
 
-
-def main(output_table):
-    # 创建SparkSession
-    spark = SparkSession.builder.appName("DataCleaning").enableHiveSupport().getOrCreate()
+def main():
+    # 创建SparkSession并配置以访问Spark元数据
+    spark = SparkSession.builder \
+        .appName("DataCleaning") \
+        .enableHiveSupport() \
+        .config("spark.sql.session.state.builder", "org.apache.spark.sql.hive.UQueryHiveACLSessionStateBuilder") \
+        .config("spark.sql.catalog.class", "org.apache.spark.sql.hive.UQueryHiveACLExternalCatalog") \
+        .config("spark.sql.extensions", ','.join(["org.apache.spark.sql.CarbonInternalExtensions", "org.apache.spark.sql.DliSparkExtension"])) \
+        .config("hive.exec.dynamic.partition.mode", "nonstrict") \
+        .config("spark.dli.metaAccess.enable", "true") \
+        .getOrCreate()
 
     # 读取数据湖中的表格信息
     query = "SELECT * FROM tid_sdi_ai4data.ai4data_enterprise_bak LIMIT 100"  # 仅读取前100行进行示例
@@ -15,24 +21,11 @@ def main(output_table):
     print("Original Data:")
     df.show()
 
-    # 数据清洗操作示例：删除包含缺失值的行
-    cleaned_df = df.na.drop()
-
-    # 显示清洗后的数据
-    print("Cleaned Data:")
-    cleaned_df.show()
-
-    # 将清洗后的数据写入另一个表
-    cleaned_df.write.mode("overwrite").saveAsTable(output_table)
+    # 将查询结果写入一个新表 find100
+    df.write.mode("overwrite").saveAsTable("tid_sdi_ai4data.find100")
 
     # 停止SparkSession
     spark.stop()
 
-
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print("Usage: dliquery <outputTable>")
-        exit(-1)
-
-    output_table = sys.argv[1]
-    main(output_table)
+    main()
