@@ -61,25 +61,27 @@ cleaners = [
     AttrRelation(['social_credit_code'], ['enterprise_name'], '21')
 ]
 
-file_load = 'data.csv'
 
-scale_factor = 5  # 数据的放大倍数，用于模拟大规模数据的情况
-# 创建Spark会话
-spark = SparkSession.builder.appName(" CleanSession").getOrCreate()
-data = spark.read.csv(file_load, header=True, inferSchema=True)
-# 生成一个包含五个相同 DataFrame 的列表
-dataframes = [data] * scale_factor
+# 创建SparkSession并配置以访问Spark元数据
+spark = SparkSession.builder \
+    .appName("DataCleaning") \
+    .config("spark.sql.session.state.builder", "org.apache.spark.sql.hive.UQueryHiveACLSessionStateBuilder") \
+    .config("spark.sql.catalog.class", "org.apache.spark.sql.hive.UQueryHiveACLExternalCatalog") \
+    .config("spark.sql.extensions", "org.apache.spark.sql.DliSparkExtension") \
+    .config("spark.sql.hive.implementation", "org.apache.spark.sql.hive.client.DliHiveClientImpl") \
+    .enableHiveSupport() \
+    .getOrCreate()
 
-def union_all(df1, df2):
-    return df1.unionAll(df2)
+# 读取数据湖中的表格信息
+query = "SELECT * FROM tid_sdi_ai4data.ai4data_enterprise_bak LIMIT 1000"  # 仅读取前1000行进行示例
+data = spark.sql(query)
 
-# 使用 reduce 高效地合并所有 DataFrame
-data = reduce(union_all, dataframes)
+
 # 添加数据行的索引
 data = data.withColumn("index", monotonically_increasing_id())
 data.persist(StorageLevel.MEMORY_AND_DISK)
 # 显示前几行数据
-data.show()
+# data.show()
 
 # # 打印Schema
 # data.printSchema()
