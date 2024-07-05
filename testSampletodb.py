@@ -63,14 +63,14 @@ cleaners = [
 
 
 
+
 # 创建SparkSession并配置以访问Spark元数据
 spark = SparkSession.builder \
     .appName("DataCleaning") \
-    .config("spark.sql.session.state.builder", "org.apache.spark.sql.hive.UQueryHiveACLSessionStateBuilder")\
-    .config("spark.sql.catalog.class", "org.apache.spark.sql.hive.UQueryHiveACLExternalCatalog")\
-    .config("spark.sql.extensions", "org.apache.spark.sql.DliSparkExtension")\
+    .config("spark.sql.session.state.builder", "org.apache.spark.sql.hive.UQueryHiveACLSessionStateBuilder") \
+    .config("spark.sql.catalog.class", "org.apache.spark.sql.hive.UQueryHiveACLExternalCatalog") \
+    .config("spark.sql.extensions", "org.apache.spark.sql.DliSparkExtension") \
     .getOrCreate()
-
 # 读取数据湖中的表格信息
 query = "SELECT * FROM tid_sdi_ai4data.ai4data_enterprise_bak"  # 仅读取前1000行进行示例
 data = spark.sql(query)
@@ -109,10 +109,11 @@ for level_index, level in enumerate(nodes):
             print(f"  在 spark 的分块数: {len(sample_Block_df)}")
             for block_index, blockData in enumerate(sample_Block_df):
                 print(f"  当前块内的样本大小: {blockData.count()}")
-                # 写入数据库
-                table_name = f"sample_{level_index}_{sample_id}"
-                blockData.write.mode("overwrite").saveAsTable(f"tid_sdi_ai4data.{table_name}")
-                print(f"  块数据已写入表: {table_name}")
+                if(blockData.count()>1000000):
+                    # 写入数据库
+                    table_name = f"sample1_{level_index}_{sample_id}"
+                    blockData.write.mode("overwrite").saveAsTable(f"tid_sdi_ai4data.{table_name}")
+                    print(f"  块数据已写入表: {table_name}")
 
 # 停止SparkSession
 spark.stop()
