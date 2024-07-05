@@ -66,11 +66,9 @@ cleaners = [
 # 创建SparkSession并配置以访问Spark元数据
 spark = SparkSession.builder \
     .appName("DataCleaning") \
-    .config("spark.sql.session.state.builder", "org.apache.spark.sql.hive.UQueryHiveACLSessionStateBuilder") \
-    .config("spark.sql.catalog.class", "org.apache.spark.sql.hive.UQueryHiveACLExternalCatalog") \
-    .config("spark.sql.extensions", "org.apache.spark.sql.DliSparkExtension") \
-    .config("spark.sql.hive.implementation", "org.apache.spark.sql.hive.client.DliHiveClientImpl") \
-    .enableHiveSupport() \
+    .config("spark.sql.session.state.builder", "org.apache.spark.sql.hive.UQueryHiveACLSessionStateBuilder")\
+    .config("spark.sql.catalog.class", "org.apache.spark.sql.hive.UQueryHiveACLExternalCatalog")\
+    .config("spark.sql.extensions", "org.apache.spark.sql.DliSparkExtension")\
     .getOrCreate()
 
 # 读取数据湖中的表格信息
