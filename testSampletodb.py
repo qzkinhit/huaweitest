@@ -67,10 +67,10 @@ cleaners = [
 # 创建SparkSession并配置以访问Spark元数据
 spark = SparkSession.builder \
     .appName("DataCleaning") \
-    .config("spark.sql.session.state.builder", "org.apache.spark.sql.hive.UQueryHiveACLSessionStateBuilder") \
-    .config("spark.sql.catalog.class", "org.apache.spark.sql.hive.UQueryHiveACLExternalCatalog") \
-    .config("spark.sql.extensions", "org.apache.spark.sql.DliSparkExtension") \
+    .config("spark.sql.session.state.builder", "org.apache.spark.sql.hive.DliLakeHouseBuilder")\
+    .config("spark.sql.catalog.class", "org.apache.spark.sql.hive.DliLakeHouseCatalog")\
     .getOrCreate()
+
 # 读取数据湖中的表格信息
 query = "SELECT * FROM tid_sdi_ai4data.ai4data_enterprise_bak"  # 仅读取前1000行进行示例
 data = spark.sql(query)
