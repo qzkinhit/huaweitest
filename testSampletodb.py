@@ -1,12 +1,26 @@
 from pyspark.sql.functions import monotonically_increasing_id
-from AnalyticsCache.cleaner_associations_cycle import PreParamClassier, discover_cleaner_associations, associations_classier
+
+from AnalyticsCache.cleaner_associations_cycle import PreParamClassier, discover_cleaner_associations, \
+    associations_classier
+# from AnalyticsCache.cleaner_associations_cycle import PreParamClassier, discover_cleaner_associations, \
+#     associations_classier
 from CoreSetSample.mapping_samplify import Generate_Sample
+# from SampleScrubber.cleaner.multiple import AttrRelation
 from functools import reduce
+
 from pyspark import StorageLevel
 from pyspark.sql import SparkSession
 
-class AttrRelation:
-    def __init__(self, source, target, name, condition_func=None, ExtDict=None, edit_rule=None):
+class AttrRelation():
+    """AttrRelation 是两组属性之间的依赖关系，使用最小修复对这个关系进行修复。功能依赖关系 (A -> B) 意味着对于每个 B 属性，可以通过 A 属性进行修复
+    """
+
+    def __init__(self, source, target, name,condition_func=None,ExtDict=None,edit_rule=None):
+        """FunctionalDependency 构造函数
+
+        source -- 一个属性名称列表
+        target -- 一个属性名称列表
+        """
         self.source = set(source)
         self.target = set(target)
         self.domain = set(source + target)
@@ -14,15 +28,15 @@ class AttrRelation:
         self.cleanerList = []
         self.name = name
         self.fixValueRules = {}
-        self.msg = '[FunctionalDependency:(s: %s, t: %s)]' % (self.source, self.target)  # 默认就是基于FD的最小修复
-        if condition_func:
+        self.msg = '[FunctionalDependency:(s: %s, t: %s)]' % (self.source, self.target)#默认就是基于FD的最小修复
+        if condition_func!=None:
+            #非简单字典类的过滤规则，condition_func是一个函数，condition_func（source=[x,y,z...]可以返回 true 或 false）
             self.fixValueRules['condition_func'] = condition_func
-        if ExtDict:
+        if ExtDict!=None:
             self.fixValueRules['ExtDict'] = ExtDict
-        if edit_rule:
+        if edit_rule!=None:
             self.fixValueRules['edit_rule'] = edit_rule
-        self.cleanerList = [self]
-
+        self.cleanerList=[self]
 cleaners = [
     AttrRelation(['establishment_date'], ['establishment_time'], '1'),
     AttrRelation(['registered_capital'], ['registered_capital_scale'], '2'),
@@ -47,6 +61,9 @@ cleaners = [
     AttrRelation(['social_credit_code'], ['enterprise_name'], '21')
 ]
 
+
+
+
 # 创建SparkSession并配置以访问Spark元数据
 spark = SparkSession.builder \
     .appName("DataCleaning") \
@@ -55,7 +72,7 @@ spark = SparkSession.builder \
     .getOrCreate()
 
 # 读取数据湖中的表格信息
-query = "SELECT * FROM tid_sdi_ai4data.ai4data_enterprise_bak LIMIT 1000"  # 仅读取前1000行进行示例
+query = "SELECT * FROM tid_sdi_ai4data.ai4data_enterprise_bak"  # 仅读取前1000行进行示例
 data = spark.sql(query)
 
 # 添加数据行的索引
@@ -92,14 +109,10 @@ for level_index, level in enumerate(nodes):
             print(f"  在 spark 的分块数: {len(sample_Block_df)}")
             for block_index, blockData in enumerate(sample_Block_df):
                 print(f"  当前块内的样本大小: {blockData.count()}")
-                if blockData.count() > 1000000:
-                    # 创建表
+                if(blockData.count()>1000000):
+                    # 写入数据库
                     table_name = f"sample1_{level_index}_{sample_id}"
-                    blockData_schema = blockData.schema
-                    create_table_query = f"CREATE TABLE IF NOT EXISTS tid_sdi_ai4data.{table_name} ({', '.join([f'{col.name} {col.dataType}' for col in blockData_schema])})"
-                    spark.sql(create_table_query)
-                    # 插入数据
-                    blockData.write.mode("append").insertInto(f"tid_sdi_ai4data.{table_name}")
+                    blockData.write.mode("overwrite").saveAsTable(f"tid_sdi_ai4data.{table_name}")
                     print(f"  块数据已写入表: {table_name}")
 
 # 停止SparkSession
