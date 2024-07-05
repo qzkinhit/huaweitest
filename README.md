@@ -1,4 +1,4 @@
-Operating System: Linux
+[[[Operating System: Linux
 OS Version: #1 SMP Wed Nov 25 18:33:06 UTC 2020
 OS Release: 3.10.0-862.14.1.5.h520.eulerosv2r7.x86_64
 CPU Architecture: x86_64
@@ -16,3 +16,4 @@ cd /home/gecongcong/anaconda3/envs/  # 进入该虚拟环境所在目录
 chmod -R 777 pyenv  # 增加权限，避免打包上传MRS后，服务器端解压失败（重要！）
 zip -r pyenv_x86.zip pyenv/  # 打包该虚拟环境pyenv
 explorer.exe .  # 若通过windows内置wsl的linux系统操作上述步骤，则打包后的文件存储位置可通过该命令访问
+](https://cmc-szv.clouddragon.huawei.com/cmcversion/index/search)](https://cmc-szv.clouddragon.huawei.com/cmcversion/index/search)](https://cmc-szv.clouddragon.huawei.com/cmcversion/index/search)
