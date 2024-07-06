@@ -66,12 +66,13 @@ cleaners = [
 # 创建SparkSession并配置以访问Spark元数据
 spark = SparkSession.builder \
     .appName("DataCleaning") \
-    .config("spark.sql.session.state.builder", "org.apache.spark.sql.hive.DliLakeHouseBuilder")\
-    .config("spark.sql.catalog.class", "org.apache.spark.sql.hive.DliLakeHouseCatalog")\
+    .config("spark.sql.session.state.builder", "org.apache.spark.sql.hive.DliLakeHouseBuilder") \
+    .config("spark.sql.catalog.class", "org.apache.spark.sql.hive.DliLakeHouseCatalog") \
+    .enableHiveSupport() \
     .getOrCreate()
 
 # 读取数据湖中的表格信息
-query = "SELECT * FROM tid_sdi_ai4data.ai4data_enterprise_bak"  # 仅读取前1000行进行示例
+query = "SELECT * FROM tid_sdi_ai4data.ai4data_enterprise_bak"  # 读取整个表
 data = spark.sql(query)
 
 # 添加数据行的索引
@@ -104,22 +105,18 @@ for level_index, level in enumerate(nodes):
                 sample_Block_df = Generate_Sample(data, sset, tset)
             else:  # 有环
                 sample_Block_df = Generate_Sample(data, sset, tset, models=models[node])
-            sample_id+=1
+            sample_id += 1
             print(f"  在 spark 的分块数: {len(sample_Block_df)}")
             for block_index, blockData in enumerate(sample_Block_df):
                 print(f"  当前块内的样本大小: {blockData.count()}")
-                if(blockData.count()>1000000):
-                    # 写入数据库
-                    table_name = f"sample0_{level_index}_{sample_id}"
-                    blockData_schema = blockData.schema
-                    create_table_query = f"CREATE TABLE IF NOT EXISTS tid_sdi_ai4data.{table_name} ({', '.join([f'{col.name} {col.dataType}' for col in blockData_schema])})"
-                    spark.sql(create_table_query)
-                    # 插入数据
-                    blockData.write.mode("append").insertInto(f"tid_sdi_ai4data.{table_name}")
+                if blockData.count() > 1000000:
+                    # 创建临时视图
+                    blockData.createOrReplaceTempView("temp_view")
+
+                    # 使用Hive SQL创建表并插入数据
+                    table_name = f"sample1_{level_index}_{sample_id}_{block_index}"
+                    spark.sql(f"CREATE TABLE IF NOT EXISTS tid_sdi_ai4data.{table_name} AS SELECT * FROM temp_view")
                     print(f"  块数据已写入表: {table_name}")
-                    # table_name = f"sample1_{level_index}_{sample_id}"
-                    # blockData.write.mode("overwrite").saveAsTable(f"tid_sdi_ai4data.{table_name}")
-                    # print(f"  块数据已写入表: {table_name}")
 
 # 停止SparkSession
 spark.stop()
