@@ -36,27 +36,27 @@ class AttrRelation():
             self.fixValueRules['edit_rule'] = edit_rule
         self.cleanerList=[self]
 cleaners = [
-    AttrRelation(['establishment_date'], ['establishment_time'], '1'),
-    AttrRelation(['registered_capital'], ['registered_capital_scale'], '2'),
-    AttrRelation(['enterprise_name'], ['industry_third'], '3'),
-    AttrRelation(['enterprise_name'], ['industry_second'], '4'),
-    AttrRelation(['enterprise_name'], ['industry_first'], '5'),
-    AttrRelation(['industry_first'], ['industry_second'], '6'),
-    AttrRelation(['industry_second'], ['industry_third'], '7'),
+    # AttrRelation(['establishment_date'], ['establishment_time'], '1'),
+    # AttrRelation(['registered_capital'], ['registered_capital_scale'], '2'),
+    # AttrRelation(['enterprise_name'], ['industry_third'], '3'),
+    # AttrRelation(['enterprise_name'], ['industry_second'], '4'),
+    # AttrRelation(['enterprise_name'], ['industry_first'], '5'),
+    # AttrRelation(['industry_first'], ['industry_second'], '6'),
+    # AttrRelation(['industry_second'], ['industry_third'], '7'),
     AttrRelation(['annual_turnover'], ['annual_turnover_interval'], '8'),
-    AttrRelation(['latitude', 'longitude'], ['province'], '9'),
-    AttrRelation(['latitude', 'longitude'], ['city'], '10'),
-    AttrRelation(['latitude', 'longitude'], ['district'], '11'),
-    AttrRelation(['enterprise_address'], ['province'], '12'),
-    AttrRelation(['enterprise_address'], ['city'], '13'),
-    AttrRelation(['enterprise_address'], ['district'], '14'),
-    AttrRelation(['enterprise_address'], ['latitude'], '15'),
-    AttrRelation(['enterprise_address'], ['longitude'], '16'),
-    AttrRelation(['province'], ['city'], '17'),
-    AttrRelation(['city'], ['district'], '18'),
-    AttrRelation(['enterprise_name'], ['enterprise_type'], '19'),
-    AttrRelation(['enterprise_id'], ['enterprise_name'], '20'),
-    AttrRelation(['social_credit_code'], ['enterprise_name'], '21')
+    # AttrRelation(['latitude', 'longitude'], ['province'], '9'),
+    # AttrRelation(['latitude', 'longitude'], ['city'], '10'),
+    # AttrRelation(['latitude', 'longitude'], ['district'], '11'),
+    # AttrRelation(['enterprise_address'], ['province'], '12'),
+    # AttrRelation(['enterprise_address'], ['city'], '13'),
+    # AttrRelation(['enterprise_address'], ['district'], '14'),
+    # AttrRelation(['enterprise_address'], ['latitude'], '15'),
+    # AttrRelation(['enterprise_address'], ['longitude'], '16'),
+    # AttrRelation(['province'], ['city'], '17'),
+    # AttrRelation(['city'], ['district'], '18'),
+    # AttrRelation(['enterprise_name'], ['enterprise_type'], '19'),
+    # AttrRelation(['enterprise_id'], ['enterprise_name'], '20'),
+    # AttrRelation(['social_credit_code'], ['enterprise_name'], '21')
 ]
 
 file_load = 'data.csv'
@@ -117,7 +117,7 @@ for level_index, level in enumerate(nodes):
             print(f"  在 spark 的分块数: {len(sample_Block_df)}")
             for blockData in sample_Block_df:
                 sample_df = blockData.toPandas()
-                print(f"数据块大小: {sample_df.shape[0]}")
+                blockData.show()
 
             #     preCleaners = [single for single in singles if
             #                    any(attr_set in sset + [node] for attr_set in single.domain)]
