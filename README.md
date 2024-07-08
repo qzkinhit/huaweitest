@@ -1,30 +1,5 @@
-# -*- coding: utf-8 -*-
-from pyspark.sql import SparkSession
-
-def main():
-    # 创建SparkSession并配置以访问Spark元数据
-    spark = SparkSession.builder \
-        .appName("DataCleaning") \
-        .config("spark.sql.session.state.builder", "org.apache.spark.sql.hive.UQueryHiveACLSessionStateBuilder")\
-        .config("spark.sql.catalog.class", "org.apache.spark.sql.hive.UQueryHiveACLExternalCatalog")\
-        .config("spark.sql.extensions", "org.apache.spark.sql.DliSparkExtension")\
-        .config("spark.sql.hive.implementation", "org.apache.spark.sql.hive.client.DliHiveClientImpl")\
-        .appName("java_spark_demo")\
-        .getOrCreate()
-
-    # 读取数据湖中的表格信息
-    query = "SELECT * FROM tid_sdi_ai4data.ai4data_enterprise_bak LIMIT 100"  # 仅读取前100行进行示例
-    df = spark.sql(query)
-    print(df.count())
-    # 显示原始数据
-    print("Original Data:")
-    df.show()
-
-    # 将查询结果写入一个新表 find100
-    df.write.mode("overwrite").saveAsTable("tid_sdi_ai4data.find100")
-
-    # 停止SparkSession
-    spark.stop()
-
-if __name__ == "__main__":
-    main()
+  File "<frozen importlib._bootstrap_external>", line 594, in spec_from_file_location
+  File "/tmp/spark-81d02bc0-e96a-4e46-a7f2-4f40db69a64c/env_new.zip/networkx/utils/backends.py", line 334
+    self.optional_graphs.add(val := k[:-1]) or val
+                                 ^
+SyntaxError: invalid syntax
