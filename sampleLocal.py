@@ -59,7 +59,7 @@ cleaners = [
     # AttrRelation(['social_credit_code'], ['enterprise_name'], '21')
 ]
 
-file_load = 'data.csv'
+file_load = 'data_num.csv'
 
 scale_factor = 5  # 数据的放大倍数，用于模拟大规模数据的情况
 # 创建Spark会话

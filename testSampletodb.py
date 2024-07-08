@@ -106,17 +106,17 @@ for level_index, level in enumerate(nodes):
             else:  # 有环
                 sample_Block_df = Generate_Sample(data, sset, tset, models=models[node])
             sample_id += 1
-            print(f"  在 spark 的分块数: {len(sample_Block_df)}")
+            # print(f"  在 spark 的分块数: {len(sample_Block_df)}")
             for block_index, blockData in enumerate(sample_Block_df):
                 print(f"  当前块内的样本大小: {blockData.count()}")
-                if blockData.count() > 1000000:
-                    # 创建临时视图
-                    blockData.createOrReplaceTempView("temp_view")
-
-                    # 使用Hive SQL创建表并插入数据
-                    table_name = f"sample1_{level_index}_{sample_id}_{block_index}"
-                    spark.sql(f"CREATE TABLE IF NOT EXISTS tid_sdi_ai4data.{table_name} AS SELECT * FROM temp_view")
-                    print(f"  块数据已写入表: {table_name}")
+                # if blockData.count() > 1000000:
+                #     # 创建临时视图
+                #     blockData.createOrReplaceTempView("temp_view")
+                #
+                #     # 使用Hive SQL创建表并插入数据
+                #     table_name = f"sample1_{level_index}_{sample_id}_{block_index}"
+                #     spark.sql(f"CREATE TABLE IF NOT EXISTS tid_sdi_ai4data.{table_name} AS SELECT * FROM temp_view")
+                #     print(f"  块数据已写入表: {table_name}")
 
 # 停止SparkSession
 spark.stop()
